@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static es.wei.Main.FILE_NAME;
 
@@ -53,8 +52,10 @@ public class Work implements Runnable {
             String informacionBolsa;
             int idAccion;
             String nombreAccion;
-            PasswordEncryptor encryptor =new BasicPasswordEncryptor();
-
+            PasswordEncryptor encryptor = new BasicPasswordEncryptor();
+            String secreto = null;
+            String encriptado = null;
+            boolean bloqueado = false;
             while (true) {
                 printer.println("Introduce siguiente numeros:");
                 printer.println("\n1:Crear nuevo usuario");
@@ -97,7 +98,7 @@ public class Work implements Runnable {
                         printerFile.flush();
                     }
                 }
-                if (line == 3) {
+                if (line == 3 && bloqueado == false) {
                     printer.println("Escribe un lo que quieres informar( BUY o SELL ): ");
                     compraVenta = bReader.readLine();
                     printer.println("1: SAN: Banco Santander");
@@ -136,16 +137,50 @@ public class Work implements Runnable {
                         printer.println(formatear.format(fecha) + "--Se ha enviado a usuario: " + correoUsuario);
                         executorServiceWork.execute(new Envio(informacionBolsa, correoUsuario));
                     }
+                }else if(line==3){
+                    printer.println("El servidor esta bloqueado");
                 }
-                if (line == 4) {
+                if (line == 4 && bloqueado == false) {
                     printer.println("Estas en la pagina de bloquear servidor.");
-                    printer.println("Crear una contraseña(0 para salir ) :");
+                    printer.println("Crear una contraseña con 6 caracteres('exit' para salir ) :");
+                    while (true) {
+                        secreto = bReader.readLine();
+                        if (secreto.equals("exit")) {
+                            break;
+                        } else {
+                            if (secreto.length() > 5) {
+                                encriptado = encryptor.encryptPassword(secreto);
+                                System.out.println("Encriptado" + encriptado);
+                                bloqueado = true;
+                                break;
+                            } else {
+                                printer.println("Por favor introduce 6 caracteres o exit");
+                            }
+                        }
+                    }
+                } else if (line == 4) {
+                    printer.println("El servido ha sido bloqueado.");
                 }
-                if (line == 5) {
-
+                if (line == 5 && bloqueado == true) {
+                    printer.println("Por favor introduce la contraseña para desbloquear('exit' para salir').");
+                    while (true) {
+                        secreto = bReader.readLine();
+                        if (secreto.equals("exit")) {
+                            break;
+                        } else {
+                            if (encryptor.checkPassword(secreto, encriptado)) {
+                                bloqueado = false;
+                                break;
+                            } else {
+                                printer.println("La contraseña es incorrecta.");
+                                printer.println("Por favor vuelve a introducir la contraseña o 'exit' para salir");
+                            }
+                        }
+                    }
+                } else if (line == 5) {
+                    printer.println("El servidor no esta bloqueado.");
                 }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
