@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,10 +14,10 @@ public class Main {
 
     private static final int PORT_HTTP = 8989;
     public static final String FILE_NAME = "usuarios.txt";
+    private static ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     public static void main(String[] args) throws IOException {
         File file = new File(FILE_NAME);
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
         ServerSocket server = new ServerSocket(PORT_HTTP);
         Socket cliente;
         while (true) {
@@ -38,7 +37,7 @@ public class Main {
         }
 
         public String getCorreo(String s) {
-            return s.substring(s.lastIndexOf(";")+1);
+            return s.substring(s.lastIndexOf(";") + 1);
         }
 
         public void run() {
@@ -74,7 +73,6 @@ public class Main {
                     printer.println("\n4:Bloquear servidor");
                     printer.println("\n5:Desbloquear servidor");
                     printer.println("\n0:Salir");
-
                     line = Integer.parseInt(bReader.readLine());
                     if (line == 0) {
                         bReader.close();
@@ -144,10 +142,10 @@ public class Main {
                         }
                         while ((usuario = bReaderFile.readLine()) != null) {
                             correoUsuario = getCorreo(usuario);
-                            printer.println(formatear.format(fecha)+"--Se ha enviado a usuario: " + correoUsuario);
+                            printer.println(formatear.format(fecha) + "--Se ha enviado a usuario: " + correoUsuario);
                         }
-                        informacionBolsa=compraVenta+"-"+nombreAccion;
-
+                        informacionBolsa = compraVenta + "-" + nombreAccion;
+                        ejecutarProcesoEnviar(informacionBolsa);
                     }
                     if (line == 4) {
 
@@ -161,6 +159,19 @@ public class Main {
 
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        private void ejecutarProcesoEnviar(String info) throws IOException {
+            System.out.println("Ejecutar proceso");
+            ProcessBuilder builder = new ProcessBuilder("java", "-cp", "C:\\Users\\luolu\\IdeaProjects\\Servidor\\target\\classes\\es\\wei\\Enviar.class", info);
+            Process lsProcess =builder.start();
+            InputStream processOut=lsProcess.getInputStream();
+            InputStreamReader isr=new InputStreamReader(processOut);
+            BufferedReader bis=new BufferedReader(isr);
+            String line;
+            while ((line=bis.readLine())!=null){
+                System.out.println(line);
             }
         }
     }
