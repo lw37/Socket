@@ -38,7 +38,7 @@ public class Main {
         }
 
         public String getCorreo(String s) {
-            return s.contains(";") ? s.substring(s.indexOf(';')).trim() : "";
+            return s.substring(s.lastIndexOf(";")+1);
         }
 
         public void run() {
@@ -139,11 +139,15 @@ public class Main {
                             case 6:
                                 nombreAccion = "BTCUSD";
                                 break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + idAccion);
                         }
                         while ((usuario = bReaderFile.readLine()) != null) {
                             correoUsuario = getCorreo(usuario);
-                            printer.println("Se ha enviado a usuario: " + correoUsuario);
+                            printer.println(formatear.format(fecha)+"--Se ha enviado a usuario: " + correoUsuario);
                         }
+                        informacionBolsa=compraVenta+"-"+nombreAccion;
+
                     }
                     if (line == 4) {
 
