@@ -15,12 +15,12 @@ import static es.wei.Main.FILE_NAME;
 
 public class Work implements Runnable {
     public static ExecutorService executorServiceWork = Executors.newFixedThreadPool(2);
-    private Socket client;
-    private File file;
+    private Socket cliente;
+    private File fichero;
 
-    public Work(Socket client, File file) {
-        this.client = client;
-        this.file = file;
+    public Work(Socket cliente, File fichero) {
+        this.cliente = cliente;
+        this.fichero = fichero;
     }
 
     public String getCorreo(String s) {
@@ -28,12 +28,12 @@ public class Work implements Runnable {
     }
 
     public void run() {
-        System.out.println(" conectado cliente por puerto:" + client.getPort());
+        System.out.println(" conectado cliente por puerto:" + cliente.getPort());
         OutputStream outputStream;
         InputStream input;
         try {
-            outputStream = client.getOutputStream();
-            input = client.getInputStream();
+            outputStream = cliente.getOutputStream();
+            input = cliente.getInputStream();
             BufferedReader bReader = new BufferedReader(new InputStreamReader(input));
             PrintWriter printer = new PrintWriter(new OutputStreamWriter(outputStream), true);
             FileWriter writer = new FileWriter(FILE_NAME);
@@ -70,7 +70,7 @@ public class Work implements Runnable {
                     printerFile.close();
                     readerFile.close();
                     printer.close();
-                    client.close();
+                    cliente.close();
                 }
                 if (line == 1) {
                     printer.println("Introduce el nombre :");
@@ -88,8 +88,8 @@ public class Work implements Runnable {
                         usuarioLista.add(usuario);
                         printer.println(usuarioLista.size() + ":" + usuario);
                     }
-                    file.delete();
-                    file.createNewFile();
+                    fichero.delete();
+                    fichero.createNewFile();
                     printer.println("Introduce el ID para eliminar el usario( 0 para salir)");
                     numeroEliminar = Integer.parseInt(bReader.readLine());
                     usuarioLista.remove(numeroEliminar - 1);
