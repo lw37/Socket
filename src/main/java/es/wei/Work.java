@@ -15,48 +15,45 @@ import static es.wei.Main.FILE_NAME;
 
 public class Work implements Runnable {
     public static ExecutorService executorServiceWork = Executors.newFixedThreadPool(2);
-    private Socket cliente;
-    private File fichero;
+    private final Socket cliente;
 
-    public Work(Socket cliente, File fichero) {
+    public Work(Socket cliente) {
         this.cliente = cliente;
-        this.fichero = fichero;
     }
 
     public String getCorreo(String s) {
         return s.substring(s.lastIndexOf(";") + 1);
     }
 
+    public String fechaActual() {
+        Date fecha = new Date();
+        SimpleDateFormat formatear = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return formatear.format(fecha);
+    }
+
     public void run() {
-        System.out.println(" conectado cliente por puerto:" + cliente.getPort());
-        OutputStream outputStream;
-        InputStream input;
         try {
+
+            OutputStream outputStream;
+            InputStream input;
             outputStream = cliente.getOutputStream();
             input = cliente.getInputStream();
             BufferedReader bReader = new BufferedReader(new InputStreamReader(input));
             PrintWriter printer = new PrintWriter(new OutputStreamWriter(outputStream), true);
-            FileWriter writer = new FileWriter(FILE_NAME);
-            PrintWriter printerFile = new PrintWriter(writer, true);
-            FileReader readerFile = new FileReader(FILE_NAME);
-            BufferedReader bReaderFile = new BufferedReader(readerFile);
             int line;
-            String nombreUsuario;
-            String apellidoUsuario;
-            String correoUsuario;
-            String usuario;
-            Date fecha = new Date();
-            SimpleDateFormat formatear = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            String nombreUsuario, apellidoUsuario, correoUsuario, usuario;
             int numeroEliminar;
-            String compraVenta;
-            String informacionBolsa;
+            String compraVenta, informacionBolsa, nombreAccion;
             int idAccion;
-            String nombreAccion;
             PasswordEncryptor encryptor = new BasicPasswordEncryptor();
-            String secreto = null;
+            String secreto;
             String encriptado = null;
             boolean bloqueado = false;
             while (true) {
+                FileWriter writer = new FileWriter(FILE_NAME, true);
+                PrintWriter printerFile = new PrintWriter(writer, true);
+                FileReader readerFile = new FileReader(FILE_NAME);
+                BufferedReader bReaderFile = new BufferedReader(readerFile);
                 printer.println("Introduce siguiente numeros:");
                 printer.println("\n1:Crear nuevo usuario");
                 printer.println("\n2:Eliminar usuario");
@@ -66,10 +63,6 @@ public class Work implements Runnable {
                 printer.println("\n0:Salir");
                 line = Integer.parseInt(bReader.readLine());
                 if (line == 0) {
-                    bReader.close();
-                    printerFile.close();
-                    readerFile.close();
-                    printer.close();
                     cliente.close();
                 }
                 if (line == 1) {
@@ -80,7 +73,7 @@ public class Work implements Runnable {
                     printer.println("Introduce el email(....@gmail.com) :");
                     correoUsuario = bReader.readLine();
                     printerFile.println(nombreUsuario + ";" + apellidoUsuario + ";" + correoUsuario + "@gmial.com");
-                    printer.println(formatear.format(fecha) + "--Se crea nuevo usuario " + correoUsuario + "@gmial.com");
+                    printer.println(fechaActual() + "--Se crea nuevo usuario " + correoUsuario + "@gmial.com");
                 }
                 if (line == 2) {
                     ArrayList<String> usuarioLista = new ArrayList<String>();
@@ -88,17 +81,21 @@ public class Work implements Runnable {
                         usuarioLista.add(usuario);
                         printer.println(usuarioLista.size() + ":" + usuario);
                     }
-                    fichero.delete();
-                    fichero.createNewFile();
-                    printer.println("Introduce el ID para eliminar el usario( 0 para salir)");
+                    printer.println("Introduce el ID para eliminar el usario");
                     numeroEliminar = Integer.parseInt(bReader.readLine());
+                    if (numeroEliminar == 0) {
+                        break;
+                    }
+                    printer.println(fechaActual() + "Has eliminado el usuario: " + usuarioLista.get(numeroEliminar - 1));
                     usuarioLista.remove(numeroEliminar - 1);
+                    FileWriter writer1 = new FileWriter(FILE_NAME, false);
+                    writer1.write("");
+                    writer1.close();
                     for (int i = 0; i < usuarioLista.size(); i++) {
                         printerFile.println(usuarioLista.get(i));
-                        printerFile.flush();
                     }
                 }
-                if (line == 3 && bloqueado == false) {
+                if (line == 3 && !bloqueado) {
                     printer.println("Escribe un lo que quieres informar( BUY o SELL ): ");
                     compraVenta = bReader.readLine();
                     printer.println("1: SAN: Banco Santander");
@@ -134,13 +131,13 @@ public class Work implements Runnable {
                     informacionBolsa = compraVenta + "-" + nombreAccion;
                     while ((usuario = bReaderFile.readLine()) != null) {
                         correoUsuario = getCorreo(usuario);
-                        printer.println(formatear.format(fecha) + "--Se ha enviado a usuario: " + correoUsuario);
+                        printer.println(fechaActual() + "--Se ha enviado a usuario: " + correoUsuario);
                         executorServiceWork.execute(new Envio(informacionBolsa, correoUsuario));
                     }
-                }else if(line==3){
-                    printer.println("El servidor esta bloqueado");
+                } else if (line == 3) {
+                    printer.println(fechaActual() + "--El servidor esta bloqueado");
                 }
-                if (line == 4 && bloqueado == false) {
+                if (line == 4 && !bloqueado) {
                     printer.println("Estas en la pagina de bloquear servidor.");
                     printer.println("Crear una contraseña con 6 caracteres('exit' para salir ) :");
                     while (true) {
@@ -152,6 +149,7 @@ public class Work implements Runnable {
                                 encriptado = encryptor.encryptPassword(secreto);
                                 System.out.println("Encriptado" + encriptado);
                                 bloqueado = true;
+                                printer.println(fechaActual() + "--Has bloqueado servidor");
                                 break;
                             } else {
                                 printer.println("Por favor introduce 6 caracteres o exit");
@@ -159,9 +157,9 @@ public class Work implements Runnable {
                         }
                     }
                 } else if (line == 4) {
-                    printer.println("El servido ha sido bloqueado.");
+                    printer.println(fechaActual() + "--El servido ha sido bloqueado.");
                 }
-                if (line == 5 && bloqueado == true) {
+                if (line == 5 && bloqueado) {
                     printer.println("Por favor introduce la contraseña para desbloquear('exit' para salir').");
                     while (true) {
                         secreto = bReader.readLine();
@@ -170,6 +168,7 @@ public class Work implements Runnable {
                         } else {
                             if (encryptor.checkPassword(secreto, encriptado)) {
                                 bloqueado = false;
+                                printer.println(fechaActual() + "--Has desbloqueado servidor");
                                 break;
                             } else {
                                 printer.println("La contraseña es incorrecta.");
@@ -178,11 +177,15 @@ public class Work implements Runnable {
                         }
                     }
                 } else if (line == 5) {
-                    printer.println("El servidor no esta bloqueado.");
+                    printer.println(fechaActual() + "--El servidor no esta bloqueado.");
                 }
+                writer.close();
+                readerFile.close();
+                bReaderFile.close();
+                printerFile.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Usuario desconectado");
         }
     }
 }
