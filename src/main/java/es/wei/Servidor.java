@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Main {
+public class Servidor {
 
     private static final int PORT_HTTP = 9876;
     public static final String FILE_NAME = "usuarios.txt";
@@ -18,7 +18,7 @@ public class Main {
         Socket cliente;
         while (true) {
             cliente = server.accept();
-            executorService.execute(new Work(cliente));
+            executorService.execute(new Trabajador(cliente));
         }
     }
 

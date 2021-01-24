@@ -11,13 +11,13 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static es.wei.Main.FILE_NAME;
+import static es.wei.Servidor.FILE_NAME;
 
-public class Work implements Runnable {
+public class Trabajador implements Runnable {
     public static ExecutorService executorServiceWork = Executors.newFixedThreadPool(2);
     private final Socket cliente;
 
-    public Work(Socket cliente) {
+    public Trabajador(Socket cliente) {
         this.cliente = cliente;
     }
 
