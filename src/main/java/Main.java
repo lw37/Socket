@@ -17,15 +17,16 @@ public class Main {
         PrintWriter printer =new PrintWriter(new OutputStreamWriter(outputStream),true);
 
         Scanner s = new Scanner(System.in);
-        String message;
+        int message;
         String line;
 
         while(true){
+            message = s.nextInt();
+            printer.println(message);
+
             while ((line=reader.readLine())!=null){
                 System.out.println((line));
             }
-            message = s.nextLine();
-            printer.println(message);
 
         }
     }
