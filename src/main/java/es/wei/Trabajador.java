@@ -33,7 +33,7 @@ public class Trabajador implements Runnable {
 
     public void run() {
         try {
-
+            System.out.println("Cliente conectado por "+cliente.getPort());
             OutputStream outputStream;
             InputStream input;
             outputStream = cliente.getOutputStream();
@@ -55,12 +55,12 @@ public class Trabajador implements Runnable {
                 FileReader readerFile = new FileReader(FILE_NAME);
                 BufferedReader bReaderFile = new BufferedReader(readerFile);
                 printer.println("Introduce siguiente numeros:");
-                printer.println("\n1:Crear nuevo usuario");
-                printer.println("\n2:Eliminar usuario");
-                printer.println("\n3:Notificar usuarios");
-                printer.println("\n4:Bloquear servidor");
-                printer.println("\n5:Desbloquear servidor");
-                printer.println("\n0:Salir");
+                printer.println("1:Crear nuevo usuario");
+                printer.println("2:Eliminar usuario");
+                printer.println("3:Notificar usuarios");
+                printer.println("4:Bloquear servidor");
+                printer.println("5:Desbloquear servidor");
+                printer.println("0:Salir");
                 line = Integer.parseInt(bReader.readLine());
                 if (line == 0) {
                     cliente.close();
