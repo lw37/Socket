@@ -48,8 +48,9 @@ public class Trabajador implements Runnable {
             PasswordEncryptor encryptor = new BasicPasswordEncryptor();
             String secreto;
             String encriptado = null;
-            boolean bloqueado = false;
+
             while (true) {
+                boolean bloqueado = true;
                 FileWriter writer = new FileWriter(FILE_NAME, true);
                 PrintWriter printerFile = new PrintWriter(writer, true);
                 FileReader readerFile = new FileReader(FILE_NAME);
@@ -61,6 +62,12 @@ public class Trabajador implements Runnable {
                 printer.println("4:Bloquear servidor");
                 printer.println("5:Desbloquear servidor");
                 printer.println("0:Salir");
+                FileWriter fwSecreto = new FileWriter("secreto.txt",true);
+                FileReader frSecreto = new FileReader("secreto.txt");
+                BufferedReader bReaderSecreto = new BufferedReader(frSecreto);
+                if (bReaderSecreto.readLine()==null){
+                    bloqueado=false;
+                }
                 line = Integer.parseInt(bReader.readLine());
                 if (line == 0) {
                     cliente.close();
@@ -146,9 +153,10 @@ public class Trabajador implements Runnable {
                             break;
                         } else {
                             if (secreto.length() > 5) {
-                                encriptado = encryptor.encryptPassword(secreto);
+                                encriptado=encryptor.encryptPassword(secreto);
+                                fwSecreto.write(encriptado);
+                                fwSecreto.close();
                                 System.out.println("Encriptado" + encriptado);
-                                bloqueado = true;
                                 printer.println(fechaActual() + "--Has bloqueado servidor");
                                 break;
                             } else {
@@ -162,12 +170,20 @@ public class Trabajador implements Runnable {
                 if (line == 5 && bloqueado) {
                     printer.println("Por favor introduce la contraseña para desbloquear('exit' para salir').");
                     while (true) {
+
                         secreto = bReader.readLine();
                         if (secreto.equals("exit")) {
                             break;
                         } else {
+                            FileReader frSecreto1 = new FileReader("secreto.txt");
+                            BufferedReader bReaderSecreto1 = new BufferedReader(frSecreto1);
+                            encriptado=bReaderSecreto1.readLine();
+                            frSecreto1.close();
+                            bReaderSecreto1.close();
                             if (encryptor.checkPassword(secreto, encriptado)) {
-                                bloqueado = false;
+                                FileWriter fwSecreto1 = new FileWriter("secreto.txt",false);
+                                fwSecreto1.write("");
+                                writer.close();
                                 printer.println(fechaActual() + "--Has desbloqueado servidor");
                                 break;
                             } else {
@@ -179,6 +195,9 @@ public class Trabajador implements Runnable {
                 } else if (line == 5) {
                     printer.println(fechaActual() + "--El servidor no esta bloqueado.");
                 }
+                fwSecreto.close();
+                frSecreto.close();
+                bReaderSecreto.close();
                 writer.close();
                 readerFile.close();
                 bReaderFile.close();
