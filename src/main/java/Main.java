@@ -5,29 +5,42 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final int PORT_HTTP =9876;
+    private static final int PORT_HTTP = 9876;
 
     public static void main(String[] args) throws IOException {
-        Socket socket= new Socket();
-        socket.connect(new InetSocketAddress("localhost",PORT_HTTP));
-        InputStream inputStream=socket.getInputStream();
-        OutputStream outputStream=socket.getOutputStream();
+        Socket socket = new Socket();
+        socket.connect(new InetSocketAddress("localhost", PORT_HTTP));
+        InputStream inputStream = socket.getInputStream();
+        OutputStream outputStream = socket.getOutputStream();
 
-        BufferedReader reader=new BufferedReader(new InputStreamReader(inputStream));
-        PrintWriter printer =new PrintWriter(new OutputStreamWriter(outputStream),true);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        PrintWriter printer = new PrintWriter(new OutputStreamWriter(outputStream), true);
 
         Scanner s = new Scanner(System.in);
-        int message;
+        int i;
+        String message;
         String line;
 
-        while(true){
-            message = s.nextInt();
-            printer.println(message);
-
-            while ((line=reader.readLine())!=null){
+        while (true) {
+            line = reader.readLine();
+            System.out.println((line));
+            if(line.equals("0:Salir")) {
+                i = s.nextInt();
+                printer.println(i);
+                line = reader.readLine();
                 System.out.println((line));
+                message = s.nextLine();
+                printer.println(message);
+                line = reader.readLine();
+                System.out.println((line));
+                message = s.nextLine();
+                printer.println(message);
+                line = reader.readLine();
+                System.out.println((line));
+                message = s.nextLine();
+                printer.println(message);
             }
-
         }
+
     }
 }
