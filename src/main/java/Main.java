@@ -24,21 +24,33 @@ public class Main {
         while (true) {
             line = reader.readLine();
             System.out.println((line));
-            if(line.equals("0:Salir")) {
+            if (line.equals("0:Salir")) {
                 i = s.nextInt();
                 printer.println(i);
-                line = reader.readLine();
-                System.out.println((line));
-                message = s.nextLine();
-                printer.println(message);
-                line = reader.readLine();
-                System.out.println((line));
-                message = s.nextLine();
-                printer.println(message);
-                line = reader.readLine();
-                System.out.println((line));
-                message = s.nextLine();
-                printer.println(message);
+                if (i == 1) {
+                    message = s.nextLine();
+                    printer.println(message);
+                    line = reader.readLine();
+                    System.out.println((line));
+
+                    message = s.nextLine();
+                    printer.println(message);
+                    line = reader.readLine();
+                    System.out.println((line));
+
+                    message = s.nextLine();
+                    printer.println(message);
+                    line = reader.readLine();
+                    System.out.println((line));
+
+                    message = s.nextLine();
+                    printer.println(message);
+                    line = reader.readLine();
+                    System.out.println((line));
+
+                }
+
+
             }
         }
 
