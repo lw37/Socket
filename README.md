@@ -5,3 +5,4 @@
     telnet localhost 9876 
 3.  Rama Mail es la libreria que encarga de enviar correo, hay que #INSTALAR en local para que funcione el servidor.
 4.  Todo los comandos tiene que ser un numero(expceto BUY-SELL y exit), si has escrido algun string es necesario que reinicie el servidor.
+5.  Introduce 0 para salir de eliminar
